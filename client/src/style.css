@@ -1,0 +1,104 @@
+body {
+    background-color: rgb(37, 37, 37);
+    color: rgb(221, 219, 219);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.App {
+    height: 100vh;
+    padding: 0px 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.2em;
+    margin: 0.1em;
+}
+
+p {
+    margin: 0.1em;
+}
+
+.recipes {
+    display: flex;
+}
+
+.recipe {
+    flex:1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: left;
+    text-align: left;
+    padding: 10px 20px;
+}
+
+
+img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    background-color: black;
+}
+
+.delete, .update, .add {
+    border: border;
+    padding: 3px 6px;
+    background-color: rgb(20, 20, 20);
+    color: white;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+input {
+    width: 250px;
+    padding: 10px;
+    border: none;
+    background-color: rgb(20, 20, 20);
+}
+
+.formButton {
+    border: none;
+    padding: 10px;
+    background-color: black; 
+    color: white;   
+}
+
+.formButton.cancelButton {
+    background-color: rgb(119, 28, 28);
+}
+
+.tags, .tag {
+    display: flex;
+    flex-direction: row;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 0px;
+    max-width: 100%;
+    height: 20px;
+    border-radius: 3px;
+    padding: 3px 10px;
+    font-size: 16px;
+    line-height: 120%;
+    color: rgba(255, 255, 255, 0.804);
+    background: rgb(40, 69, 108);
+    margin: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
