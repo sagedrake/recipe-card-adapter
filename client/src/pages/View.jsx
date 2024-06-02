@@ -42,6 +42,17 @@ const View = () => {
             } catch(err) {
                 console.log(err);
             }
+
+            try {
+                const res = await axios.get("http://localhost:8800/recipe_ingredients/"+recipeId);
+                const ingredients = res.data;
+                console.log(ingredients)
+                setRecipe(prev => ({
+                    ...prev , "ingredients": ingredients
+                }))
+            } catch(err) {
+                console.log(err);
+            }
         }
         fetchRecipe();
     },[])
@@ -72,15 +83,23 @@ const View = () => {
                     </div>
                 ))}
             </div>
-            <p>Ingredients: {recipe.ingredients}</p>
-            <p>Instructions: {recipe.instructions}</p>
+            <div className="ingredients"> 
+                <h2>Ingredients:</h2> 
+                {recipe.ingredients.map((ingredient) => (
+                    <p>{ingredient.amount + " " + ingredient.unit + " " + ingredient.ingredient_name} </p>
+                ))}
             </div>
-            <div className='buttons'>
-                <button className="delete" onClick={handleDelete}>Delete</button>
-                <button className="update">
-                    <Link to={`/update/${recipeId}`}>Update</Link>
-                </button>
+            <div className="instructions">
+                <h2>Instructions:</h2>
+                <p>{recipe.instructions}</p>
             </div>
+        </div>
+        <div className='buttons'>
+            <button className="delete" onClick={handleDelete}>Delete</button>
+            <button className="update">
+                <Link to={`/update/${recipeId}`}>Update</Link>
+            </button>
+        </div>
         <button onClick={handleBackButton} className='backButton'>Back</button>
     </div>
   )

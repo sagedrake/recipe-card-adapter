@@ -34,6 +34,15 @@ app.get("/recipe_tags/:id", (req, res)=>{
     });
 });
 
+app.get("/recipe_ingredients/:id", (req, res)=>{
+    const q = "SELECT amount, unit, ingredient_name  FROM recipe_ingredients WHERE recipe_id = ?";
+    const recipeId = req.params.id;
+    db.query(q, [recipeId],(err,data)=>{
+        if(err) return res.json(err);
+        return res.json(data);
+    });
+});
+
 app.get("/recipes/:id", (req, res)=>{
     const q = "SELECT *  FROM recipes WHERE id = ?";
     const recipeId = req.params.id;
@@ -55,7 +64,16 @@ function insertTags(recipeId, tags) {
     });
 }
 
-function insertIngredients() {
+function insertIngredients(recipeId, ingredients) {
+    // const q = "INSERT INTO `recipe_ingredients` (`recipe_id`, `amount`, `unit`, `ingredient_name`) VALUES ?";
+    // const values = tags.map((tag) => [recipeId, tag]);
+
+    // return new Promise((resolve, reject) => {
+    //     db.query(q,[values], (err, data)=> {
+    //         if(err) reject(err);
+    //         resolve("Ingredients inserted");
+    //     });
+    // });
     return new Promise((resolve, reject) => resolve("ingredients inserted"));
 }
 
@@ -155,7 +173,7 @@ app.put("/recipes/:id", (req, res)=>{
         try {
             // first delete old ingredients, then insert new ingredients
             await deleteIngredients(recipeId);
-            await insertIngredients();
+            await insertIngredients(recipeId, req.body.ingredients);
             resolve();
         } catch(err){
             reject(err);
