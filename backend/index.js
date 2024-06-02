@@ -25,30 +25,34 @@ app.get("/recipes", (req, res)=>{
     });
 });
 
-app.get("/recipe_tags/:id", (req, res)=>{
-    const q = "SELECT tag  FROM recipe_tags WHERE recipe_id = ?";
-    const recipeId = req.params.id;
-    db.query(q, [recipeId],(err,data)=>{
-        if(err) return res.json(err);
-        return res.json(data);
-    });
-});
-
-app.get("/recipe_ingredients/:id", (req, res)=>{
-    const q = "SELECT amount, unit, ingredient_name  FROM recipe_ingredients WHERE recipe_id = ?";
-    const recipeId = req.params.id;
-    db.query(q, [recipeId],(err,data)=>{
-        if(err) return res.json(err);
-        return res.json(data);
-    });
-});
-
 app.get("/recipes/:id", (req, res)=>{
-    const q = "SELECT *  FROM recipes WHERE id = ?";
     const recipeId = req.params.id;
-    db.query(q, [recipeId],(err,data)=>{
+    db.query("SELECT * FROM recipes WHERE id = ?", [recipeId],(err,data)=>{
+        // once recipe has been fetched...
         if(err) return res.json(err);
-        return res.json(data);
+        let recipe = data[0];
+        
+        // fetch recipe tags
+        let getTagsPromise = new Promise ((resolve, reject) => {
+            db.query("SELECT tag FROM recipe_tags WHERE recipe_id = ?", [recipeId],(err,data)=>{
+                if(err) reject(err);
+                const tags = data.map((x) => (x.tag));
+                recipe.tags = tags;
+                resolve("Tags have been fetched");
+            });
+        })
+        
+        // fetch recipe ingredients
+        let getIngredientsPromise = new Promise ((resolve, reject) => {
+            const recipeId = req.params.id;
+            db.query("SELECT amount, unit, ingredient_name  FROM recipe_ingredients WHERE recipe_id = ?", [recipeId],(err,data)=>{
+                if(err) reject(err);
+                recipe.ingredients = data;
+                resolve("Ingredients have been fetched");
+            });
+        })
+        
+        Promise.all([getTagsPromise, getIngredientsPromise]).then((value) => {return res.json(recipe);})
     });
 });
 
@@ -78,10 +82,8 @@ function insertIngredients(recipeId, ingredients) {
 }
 
 function deleteTags(recipeId) {
-    const q = "DELETE FROM recipe_tags WHERE recipe_id = ?"
-
     return new Promise((resolve, reject) => {
-        db.query(q, [recipeId], (err,data) => {
+        db.query("DELETE FROM recipe_tags WHERE recipe_id = ?", [recipeId], (err,data) => {
             if(err) reject(err);
             resolve("Recipe has been deleted.");
         });
@@ -123,8 +125,7 @@ app.delete("/recipes/:id", (req, res)=>{
     const recipeId = req.params.id;
 
     let recipePromise = new Promise((resolve, reject) => {
-        const q = "DELETE FROM `recipes` WHERE id = ?"
-        db.query(q, [recipeId], (err,data) => {
+        db.query("DELETE FROM `recipes` WHERE id = ?", [recipeId], (err,data) => {
             if(err) reject(err);
             resolve("Recipe deleted");
         })

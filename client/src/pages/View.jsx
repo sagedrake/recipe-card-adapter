@@ -24,37 +24,13 @@ const View = () => {
     })
 
     useEffect(() =>{
-        const fetchRecipe = async ()=> {
-            try {
-                const res = await axios.get("http://localhost:8800/recipes/"+recipeId);
-                setRecipe(prev => ({
-                     ...prev , ...res.data[0]
-                }));
-            } catch(err) {
-                console.log(err);
-            }
-            try {
-                const res = await axios.get("http://localhost:8800/recipe_tags/"+recipeId);
-                const tags = res.data.map((x) => (x.tag))
-                setRecipe(prev => ({
-                    ...prev , "tags": tags
-                }))
-            } catch(err) {
-                console.log(err);
-            }
-
-            try {
-                const res = await axios.get("http://localhost:8800/recipe_ingredients/"+recipeId);
-                const ingredients = res.data;
-                console.log(ingredients)
-                setRecipe(prev => ({
-                    ...prev , "ingredients": ingredients
-                }))
-            } catch(err) {
-                console.log(err);
-            }
-        }
-        fetchRecipe();
+        // fetch recipe
+        axios.get("http://localhost:8800/recipes/"+recipeId).then((res) => {
+            console.log(res);
+            setRecipe(prev => ({
+                ...prev , ...res.data
+            })); 
+        }).catch(console.log)
     },[])
 
     const handleBackButton = () => {
