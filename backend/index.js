@@ -56,7 +56,22 @@ function insertTags(recipeId, tags) {
 }
 
 function insertIngredients() {
-    return new Promise((resolve, reject) => resolve(5))
+    return new Promise((resolve, reject) => resolve("ingredients inserted"));
+}
+
+function deleteTags(recipeId) {
+    const q = "DELETE FROM recipe_tags WHERE recipe_id = ?"
+
+    return new Promise((resolve, reject) => {
+        db.query(q, [recipeId], (err,data) => {
+            if(err) reject(err);
+            resolve("Recipe has been deleted.");
+        });
+    });
+}
+
+function deleteIngredients(recipeId) {
+    return new Promise ((resolve, reject) => resolve("ingredients deleted"));
 }
 
 app.post("/recipes", (req, res)=>{
@@ -68,10 +83,13 @@ app.post("/recipes", (req, res)=>{
         req.body.image
     ];
 
+    // insert recipe
     db.query(q, values,(err,data)=>{
+        // once recipe is inserted...
         if(err) return res.json(err);
         let id = data.insertId;
 
+        // insert recipe tags and instructions in parallel, and return when done
         Promise.all([
             insertTags(id, req.body.tags),
             insertIngredients(id, req.body.ingredients)
@@ -85,45 +103,75 @@ app.post("/recipes", (req, res)=>{
 
 app.delete("/recipes/:id", (req, res)=>{
     const recipeId = req.params.id;
-    const q = "DELETE FROM `recipes` WHERE id = ?"
-    db.query(q, [recipeId], (err,data) => {
-        if(err) return res.json(err);
+
+    let recipePromise = new Promise((resolve, reject) => {
+        const q = "DELETE FROM `recipes` WHERE id = ?"
+        db.query(q, [recipeId], (err,data) => {
+            if(err) reject(err);
+            resolve("Recipe deleted");
+        })
     })
-    const q2 = "DELETE FROM recipe_tags WHERE recipe_id = ?"
-    db.query(q2, [recipeId], (err,data) => {
-        if(err) return res.json(err);
-        return res.json("Recipe has been deleted.");
-    })
-})
+
+    Promise.all([
+        recipePromise,
+        deleteTags(recipeId),
+        deleteIngredients(recipeId)
+    ]).then((values) => {
+        return res.json("Recipe has been deleted.")
+    }).catch((error) => {
+        return res.json(error);
+    });
+});
 
 app.put("/recipes/:id", (req, res)=>{
     const recipeId = req.params.id;
-    const q1 = "UPDATE recipes SET `name` = ?, `instructions` = ?, `rating` = ?, `image` = ? WHERE id = ?";
-    const values = [
-        req.body.name,
-        req.body.instructions,
-        req.body.rating,
-        req.body.image
-    ];
-    
-    const q2 = "DELETE FROM recipe_tags WHERE recipe_id = ?"
-    db.query(q2, [recipeId], (err,data) => {
-        if(err) return res.json(err);
-    })
 
-    const q3 = "INSERT INTO `recipe_tags` (`recipe_id`, `tag`) VALUES (?)";
-    for (let i in req.body.tags) {
-        const values2 = [recipeId, req.body.tags[i]]
-        db.query(q3,[values2], (err, data)=> {
-            if(err) return res.json(err);
-        });
-    }
+    let updateRecipePromise = new Promise((resolve, reject) => {
+        const q = "UPDATE recipes SET `name` = ?, `instructions` = ?, `rating` = ?, `image` = ? WHERE id = ?";
+        const values = [
+            req.body.name,
+            req.body.instructions,
+            req.body.rating,
+            req.body.image
+        ];
+        db.query(q, [...values, recipeId], (err,data) => {
+            if(err) reject(err);
+            resolve();
+        })
+    });
 
-    db.query(q1, [...values, recipeId], (err,data) => {
-        if(err) return res.json(err);
+    let updateTagsPromise = new Promise(async (resolve, reject) => {
+        try {
+            // first delete old tags, then insert new tags
+            await deleteTags(recipeId);
+            await insertTags(recipeId, req.body.tags);
+            resolve();
+        } catch(err){
+            reject(err);
+        }
+    });
+
+    let updateIngredientsPromise = new Promise(async (resolve, reject) => {
+        try {
+            // first delete old ingredients, then insert new ingredients
+            await deleteIngredients(recipeId);
+            await insertIngredients();
+            resolve();
+        } catch(err){
+            reject(err);
+        }
+    });
+
+    Promise.all([
+        updateRecipePromise,
+        updateTagsPromise,
+        updateIngredientsPromise
+    ]).then((values) => {
         return res.json("Recipe has been updated.");
-    })
-})
+    }).catch((error) => {
+        return res.json(error);
+    });
+});
 
 app.listen(8800, ()=> {
     console.log("connected to backend!")
