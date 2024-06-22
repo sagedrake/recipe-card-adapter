@@ -7,7 +7,6 @@ body {
 .App {
     height: 100vh;
     padding: 0px 100px;
-    display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -20,6 +19,7 @@ h1 {
 h2 {
     font-size: 1.2em;
     margin: 0.1em;
+    text-align: left;
 }
 
 p {
@@ -28,12 +28,12 @@ p {
 
 .recipes {
     display: flex;
+    flex-flow: row wrap; 
+    justify-content: left;
 }
 
 .recipe {
-    flex:1;
-    display: flex;
-    flex-direction: column;
+    width: 210px;
     gap: 10px;
     align-items: left;
     text-align: left;
@@ -55,9 +55,7 @@ img {
     color: white;
 }
 
-.form {
-    display: flex;
-    flex-direction: column;
+.form { 
     gap: 20px;
 }
 
@@ -65,18 +63,27 @@ input {
     width: 250px;
     padding: 10px;
     border: none;
+    font-size: medium;
     background-color: rgb(20, 20, 20);
+}
+
+.tagInput {
+    width: 120px;
 }
 
 .formButton {
     border: none;
-    padding: 10px;
+    padding: 15px;
+    margin: 0px 20px 20px 1px;
+    width: 120px;
+    font-size: medium;
     background-color: black; 
     color: white;   
 }
 
 .formButton.cancelButton {
     background-color: rgb(119, 28, 28);
+    width: 100px;
 }
 
 .tags, .tag {
@@ -101,4 +108,14 @@ input {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.ingredientInput {
+    width: 40px;
+    padding: 10px;
+    margin: 5px
+}
+
+.ingredientsForm {
+    display: inline;
 }
