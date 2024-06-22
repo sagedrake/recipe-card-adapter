@@ -47,36 +47,49 @@ const View = () => {
     }
 
   return (
-    <div className='form'>
-        <div className='recipe'>
-            {recipe.image && <img src="recipe.image" alt="" />}
-            <h1>{recipe.name}</h1>
-            <p>Rating: {recipe.rating}</p>
-            <div className="tags">
-                {recipe.tags.map((tag) => (
-                    <div className="tag">
-                        {tag}
-                    </div>
-                ))}
-            </div>
-            <div className="ingredients"> 
-                <h2>Ingredients:</h2> 
-                {recipe.ingredients.map((ingredient) => (
-                    <p>{ingredient.amount + " " + ingredient.unit + " " + ingredient.ingredient_name} </p>
-                ))}
-            </div>
-            <div className="instructions">
-                <h2>Instructions:</h2>
-                <p>{recipe.instructions}</p>
-            </div>
-        </div>
-        <div className='buttons'>
+    <div className='view-recipe'>
+        <div className='buttons buttons-header'>
+            <button onClick={handleBackButton} className='backButton'>Back</button>
             <button className="delete" onClick={handleDelete}>Delete</button>
             <button className="update">
                 <Link to={`/update/${recipeId}`}>Update</Link>
             </button>
         </div>
-        <button onClick={handleBackButton} className='backButton'>Back</button>
+        <div className='recipe-overview'>
+            {/* {recipe.image && <img className ="recipe-image" src={recipe.image} alt="image of recipe" />} */}
+            <div className = "recipe-info">
+                <h1>{recipe.name}</h1>
+                <h3>Rating: {recipe.rating}</h3>
+                <div className="tags">
+                    <h3>Tags:</h3>
+                    {recipe.tags.map((tag) => (
+                        <div className="tag">
+                            {tag}
+                        </div>
+                    ))}
+                </div>
+            </div> 
+            <div className ="recipe-image">Image of recipe</div>  
+        </div>
+        <div className="ingredients"> 
+            <h2>Ingredients:</h2> 
+            <ul className='ingredients-list'>
+                {recipe.ingredients.map((ingredient) => (
+                    <li className='ingredient'>{ingredient.amount + " " + ingredient.unit + " " + ingredient.ingredient_name} </li>
+                ))}
+            </ul>
+        </div>
+        <div className="instructions">
+            <h2>Instructions:</h2>
+            <p>{recipe.instructions}</p>
+        </div>
+        
+        <div className='buttons buttons-footer'>
+            <button className="delete" onClick={handleDelete}>Delete</button>
+            <button className="update">
+                <Link to={`/update/${recipeId}`}>Update</Link>
+            </button>
+        </div>
     </div>
   )
 }

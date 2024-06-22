@@ -10,6 +10,7 @@ import Add from "./pages/Add";
 import Update from "./pages/Update";
 import View from "./pages/View";
 import "./style.css";
+import "./View-styles.css";
 
 function App() {
   return (
