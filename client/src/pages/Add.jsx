@@ -2,6 +2,9 @@ import React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
+import Button from '@mui/material/Button';
+import Rating from '@mui/material/Rating';
+import Stack from '@mui/material/Stack';
 
 const Add = () => {
     const [recipe, setRecipe] = useState({
@@ -39,17 +42,26 @@ const Add = () => {
     }
 
   return (
-    <div className='form'>
+    <Stack spacing={4} alignItems="center">
         <h1>Add New Recipe</h1>
-        <input type="text" placeholder='name' onChange={handleChange} name='name'/>
-        <input type="text" placeholder='instructions' onChange={handleChange} name='instructions'/>
-        <input type="text" placeholder='ingredients' name='ingredients'/>
-        <input type="number" placeholder='rating' onChange={handleChange} name='rating'/>
-        <input type="text" placeholder='tags' onChange={handleTagChange} name='tags'/>
-        <input type="text" placeholder='image' onChange={handleChange} name='image'/>
-        <button onClick={handleClick} className='formButton'>Add</button>
-        <button onClick={handleCancel} className='formButton cancelButton'>Cancel</button>
-    </div>
+        <Stack spacing={2} justifyContent="center">         
+            <input type="text" placeholder='name' onChange={handleChange} name='name'/>
+            <input type="text" placeholder='instructions' onChange={handleChange} name='instructions'/>
+            <input type="text" placeholder='ingredients' name='ingredients'/>
+            <Stack direction="row" alignItems="center">
+                <p>Rating:</p>
+                <Rating name="rating" defaultValue={4} size="large" onChange={handleChange} />
+            </Stack>
+            <input type="text" placeholder='tags' onChange={handleTagChange} name='tags'/>
+            <input type="text" placeholder='image' onChange={handleChange} name='image'/>
+            
+            
+        </Stack>
+        <Stack direction="row" alignItems="center" spacing={2}>
+                <Button onClick={handleClick} variant="contained" color="success">Add</Button>
+                <Button onClick={handleCancel} variant="contained" color="error">Cancel</Button>
+        </Stack>
+    </Stack>
   )
 }
 
