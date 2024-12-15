@@ -2,7 +2,11 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
+import IconButton from "@mui/material/IconButton";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
 
 const View = () => {
 	const navigate = useNavigate();
@@ -50,15 +54,21 @@ const View = () => {
 	return (
 		<div className="view-recipe">
 			<div className="buttons buttons-header">
-				<button onClick={handleBackButton} className="backButton">
-					Back
-				</button>
-				<button className="delete" onClick={handleDelete}>
-					Delete
-				</button>
-				<button className="update">
-					<Link to={`/update/${recipeId}`}>Update</Link>
-				</button>
+				<IconButton aria-label="back" variant="outlined" onClick={handleBackButton}>
+					<ArrowBackIosIcon />
+				</IconButton>
+				<IconButton
+					component={RouterLink}
+					to={`/update/${recipeId}`}
+					aria-label="edit"
+					variant="outlined"
+					onClick={handleBackButton}
+				>
+					<EditIcon />
+				</IconButton>
+				<IconButton aria-label="delete" variant="outlined" onClick={handleDelete}>
+					<DeleteOutlineIcon />
+				</IconButton>
 			</div>
 			<div className="recipe-overview">
 				{/* {recipe.image && <img className ="recipe-image" src={recipe.image} alt="image of recipe" />} */}
@@ -87,15 +97,6 @@ const View = () => {
 			<div className="instructions">
 				<h2>Instructions:</h2>
 				<p>{recipe.instructions}</p>
-			</div>
-
-			<div className="buttons buttons-footer">
-				<button className="delete" onClick={handleDelete}>
-					Delete
-				</button>
-				<button className="update">
-					<Link to={`/update/${recipeId}`}>Update</Link>
-				</button>
 			</div>
 		</div>
 	);

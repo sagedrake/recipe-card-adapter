@@ -56,10 +56,10 @@ const Add = () => {
 				<input type="text" placeholder="image" onChange={handleChange} name="image" />
 			</Stack>
 			<Stack direction="row" alignItems="center" spacing={2}>
-				<Button onClick={handleClick} variant="contained" color="success">
+				<Button onClick={handleClick} variant="contained" color="primary">
 					Add
 				</Button>
-				<Button onClick={handleCancel} variant="contained" color="error">
+				<Button onClick={handleCancel} variant="outlined" color="primary">
 					Cancel
 				</Button>
 			</Stack>

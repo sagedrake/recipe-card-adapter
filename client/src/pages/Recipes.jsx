@@ -2,7 +2,9 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
+import Link from "@mui/material/Link";
+import Button from "@mui/material/Button";
 
 const Recipes = () => {
 	const [recipes, setRecipes] = useState([]);
@@ -26,16 +28,16 @@ const Recipes = () => {
 				{recipes.map((recipe) => (
 					<div className="recipe" key={recipe.id}>
 						{recipe.image && <img src="recipe.image" alt="" />}
-						<h2>
-							<Link to={`/view/${recipe.id}`}>{recipe.name}</Link>
-						</h2>
+						<Link component={RouterLink} to={`/view/${recipe.id}`} underline="none" color="inherit">
+							<h2>{recipe.name}</h2>
+						</Link>
 						<p>Rating: {recipe.rating}</p>
 					</div>
 				))}
 			</div>
-			<button className="add">
-				<Link to="/add">Add new recipe</Link>
-			</button>
+			<Button component={RouterLink} to="/add" variant="contained" color="primary">
+				Add new recipe
+			</Button>
 		</div>
 	);
 };
