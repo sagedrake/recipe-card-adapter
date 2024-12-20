@@ -23,11 +23,14 @@ export async function connectToInstagram() {
 	}
 }
 
+// close browser that was connected to instagram
 export async function disconnectFromInstagram() {
 	try {
-		await browser.close();
+		if (browser) {
+			await browser.close();
+		}
 		return Promise.resolve();
-	} catch(e) {
+	} catch (e) {
 		return Promise.reject(new Error(`Error when closing browser: ${e}`));
 	}
 }

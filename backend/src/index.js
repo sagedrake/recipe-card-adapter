@@ -34,12 +34,16 @@ app.get("/recipes/:id", (req, res) => {
 
 		// fetch recipe tags
 		let getTagsPromise = new Promise((resolve, reject) => {
-			db.query("SELECT tag FROM recipe_tags WHERE recipe_id = ?", [recipeId], (err, data) => {
-				if (err) reject(err);
-				const tags = data.map((x) => x.tag);
-				recipe.tags = tags;
-				resolve("Tags have been fetched");
-			});
+			db.query(
+				"SELECT tag FROM recipe_tags WHERE recipe_id = ?",
+				[recipeId],
+				(err, data) => {
+					if (err) reject(err);
+					const tags = data.map((x) => x.tag);
+					recipe.tags = tags;
+					resolve("Tags have been fetched");
+				}
+			);
 		});
 
 		// fetch recipe ingredients
@@ -101,7 +105,8 @@ function deleteIngredients(recipeId) {
 }
 
 app.post("/recipes", (req, res) => {
-	const q = "INSERT INTO recipes (`name`, `instructions`, `rating`, `image`) VALUES (?, ?, ?, ?)";
+	const q =
+		"INSERT INTO recipes (`name`, `instructions`, `rating`, `image`) VALUES (?, ?, ?, ?)";
 	const values = [req.body.name, req.body.instructions, req.body.rating, req.body.image];
 
 	// insert recipe
