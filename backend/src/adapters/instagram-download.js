@@ -1,13 +1,15 @@
 import puppeteer from "puppeteer";
+import "dotenv/config";
 
 export const INSTAGRAM_URL = "https://www.instagram.com/";
+const INSTAGRAM_LOGIN_URL = "https://www.instagram.com/accounts/login/";
 const SCREEN_WIDTH = 1080;
 const SCREEN_HEIGHT = 1024;
 
 let browser;
 
 // connect to instagram using puppeteer and return page
-// if this function fails, it's a sign that internet may be down or instagram may be down
+// used to test whether instagram can be connected to
 export async function connectToInstagram() {
 	try {
 		browser = await puppeteer.launch();
@@ -35,40 +37,58 @@ export async function disconnectFromInstagram() {
 	}
 }
 
-// login to instagram on the provided page, which whould be on instagram.com already
-function loginToInstagram(page) {}
+// login to instagram on the provided page
+// code taken and modified from Grant Miller's answer on https://stackoverflow.com/questions/52977128/puppeteer-login-to-instagram
+async function loginToInstagram(page) {
+	try {
+		await page.goto(INSTAGRAM_LOGIN_URL, {
+			waitUntil: "networkidle0",
+		});
+
+		// Wait for log in form
+		await Promise.all([
+			page.waitForSelector('[name="username"]'),
+			page.waitForSelector('[name="password"]'),
+			page.waitForSelector('[type="submit"]'),
+		]);
+
+		// username and password are stored in .env file
+		await page.type('[name="username"]', process.env.INSTAGRAM_USERNAME);
+		await page.type('[name="password"]', process.env.INSTAGRAM_PASSWORD);
+
+		// Submit log in credentials
+		// If login info is wrong, the page won't go to a new url and waitForNavigation will time out
+		await Promise.all([
+			page.click('[type="submit"]'),
+			page.waitForNavigation({
+				timeout: 10000,
+			}),
+		]);
+
+		return Promise.resolve();
+	} catch (e) {
+		return Promise.reject(`Unexpected error when logging in to Instagram: ${e}`);
+	}
+}
 
 // navigate to the user's saved posts
-function enterSavedPosts(page) {}
+export async function getSavedPosts(page) {
+	try {
+		const savedPostsURL = `${INSTAGRAM_URL}${process.env.INSTAGRAM_USERNAME}/saved`;
+		await loginToInstagram(page);
+		await page.goto(savedPostsURL, {
+			waitUntil: "networkidle0",
+		});
+
+		if (page.url() !== savedPostsURL) {
+			// if user is not signed in successfully, request to saved posts url will redirect to another url
+			return Promise.reject("Cannot go to user's saved posts. Login may have failed.");
+		}
+	} catch (e) {
+		return Promise.reject(`Unexpected error when getting saved posts: ${e}`);
+	}
+	return Promise.resolve();
+}
 
 // return [<username>, <description>] for now (will get image too at some point)
 function getPostInfo(page) {}
-
-// (async () => {
-// 	// Launch the browser and open a new blank page
-// 	const browser = await puppeteer.launch();
-// 	const page = await browser.newPage();
-
-// 	// Navigate the page to a URL
-// 	await page.goto("https://developer.chrome.com/");
-
-// 	// Set screen size
-// 	await page.setViewport({ width: 1080, height: 1024 });
-
-// 	// Type into search box
-// 	await page.type(".devsite-search-field", "automate beyond recorder");
-
-// 	// Wait and click on first result
-// 	const searchResultSelector = ".devsite-result-item-link";
-// 	await page.waitForSelector(searchResultSelector);
-// 	await page.click(searchResultSelector);
-
-// 	// Locate the full title with a unique string
-// 	const textSelector = await page.waitForSelector("text/Customize and automate");
-// 	const fullTitle = await textSelector?.evaluate((el) => el.textContent);
-
-// 	// Print the full title
-// 	console.log('The title of this blog post is "%s".', fullTitle);
-
-// 	await browser.close();
-// })();

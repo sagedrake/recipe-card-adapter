@@ -7,9 +7,11 @@
 // test usage of AI tools for getting recipe title, ingredients, and instructions
 
 import { expect } from "chai";
+import "dotenv/config";
 import {
 	connectToInstagram,
 	disconnectFromInstagram,
+	getSavedPosts,
 	INSTAGRAM_URL,
 } from "../../src/adapters/instagram-download.js";
 
@@ -23,5 +25,20 @@ describe("Instagram", function () {
 		} catch (e) {
 			expect.fail(e);
 		}
+	});
+
+	it("Should be able to get saved posts", async function () {
+		try {
+			let page = await connectToInstagram();
+			await getSavedPosts(page);
+			await disconnectFromInstagram();
+		} catch (e) {
+			expect.fail(e);
+		}
+	});
+
+	it("Save credentials", async function () {
+		console.log(process.env.INSTAGRAM_USERNAME);
+		console.log(process.env.INSTAGRAM_PASSWORD);
 	});
 });
