@@ -30,15 +30,10 @@ describe("Instagram", function () {
 	it("Should be able to get saved posts", async function () {
 		try {
 			let page = await connectToInstagram();
-			await getSavedPosts(page);
+			await getSavedPosts(page, "Test");
 			await disconnectFromInstagram();
 		} catch (e) {
 			expect.fail(e);
 		}
-	});
-
-	it("Save credentials", async function () {
-		console.log(process.env.INSTAGRAM_USERNAME);
-		console.log(process.env.INSTAGRAM_PASSWORD);
 	});
 });

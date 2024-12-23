@@ -72,7 +72,7 @@ async function loginToInstagram(page) {
 }
 
 // navigate to the user's saved posts
-export async function getSavedPosts(page) {
+export async function getSavedPosts(page, collectionName) {
 	try {
 		const savedPostsURL = `${INSTAGRAM_URL}${process.env.INSTAGRAM_USERNAME}/saved`;
 		await loginToInstagram(page);
@@ -84,11 +84,23 @@ export async function getSavedPosts(page) {
 			// if user is not signed in successfully, request to saved posts url will redirect to another url
 			return Promise.reject("Cannot go to user's saved posts. Login may have failed.");
 		}
+
+		await Promise.all([
+			// find collection with correct title and click to open it
+			page
+				.locator(`[aria-label='Saved collections'] a[aria-label='${collectionName}']`)
+				.click(),
+			// wait for url to change after opening collection
+			page.waitForNavigation({
+				timeout: 10000,
+			}),
+		]);
+
+		console.log("Collection URL: " + page.url());
+
+		// get info of first post in the collection and print to console
 	} catch (e) {
 		return Promise.reject(`Unexpected error when getting saved posts: ${e}`);
 	}
 	return Promise.resolve();
 }
-
-// return [<username>, <description>] for now (will get image too at some point)
-function getPostInfo(page) {}
