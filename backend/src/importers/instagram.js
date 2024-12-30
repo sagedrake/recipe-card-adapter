@@ -71,8 +71,9 @@ async function loginToInstagram(page) {
 	}
 }
 
-// navigate to the user's saved posts
+// return array of posts with properties username, url, imageURL, description
 export async function getSavedPosts(page, collectionName) {
+	let post = {};
 	try {
 		const savedPostsURL = `${INSTAGRAM_URL}${process.env.INSTAGRAM_USERNAME}/saved`;
 		await loginToInstagram(page);
@@ -85,22 +86,30 @@ export async function getSavedPosts(page, collectionName) {
 			return Promise.reject("Cannot go to user's saved posts. Login may have failed.");
 		}
 
+		// find collection with correct title, click to open it, and wait for url to change
 		await Promise.all([
-			// find collection with correct title and click to open it
 			page
 				.locator(`[aria-label='Saved collections'] a[aria-label='${collectionName}']`)
 				.click(),
-			// wait for url to change after opening collection
-			page.waitForNavigation({
-				timeout: 10000,
-			}),
+			page.waitForNavigation({ timeout: 10000 }),
 		]);
 
-		console.log("Collection URL: " + page.url());
+		const image = await page.waitForSelector("div._aagv > img");
+		post.imageURL = await image.evaluate((i) => i.getAttribute("src"));
+		post.description = await image.evaluate((i) => i.getAttribute("alt"));
 
-		// get info of first post in the collection and print to console
+		// click on first post in collection and wait to navigate to that post's url
+		await Promise.all([
+			page.locator("a:has(._aagu)").click(),
+			page.waitForNavigation({ timeout: 10000 }),
+		]);
+
+		post.url = page.url();
+
+		const element = await page.waitForSelector("span.xt0psk2 > div > a");
+		post.username = await element.evaluate((el) => el.textContent);
 	} catch (e) {
 		return Promise.reject(`Unexpected error when getting saved posts: ${e}`);
 	}
-	return Promise.resolve();
+	return Promise.resolve([post]);
 }

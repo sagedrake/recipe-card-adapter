@@ -13,7 +13,7 @@ import {
 	disconnectFromInstagram,
 	getSavedPosts,
 	INSTAGRAM_URL,
-} from "../../src/adapters/instagram-download.js";
+} from "../../src/importers/instagram.js";
 
 describe("Instagram", function () {
 	it("Should successfully connect to instagram site", async function () {
@@ -27,13 +27,28 @@ describe("Instagram", function () {
 		}
 	});
 
-	it("Should be able to get saved posts", async function () {
+	it("Should retrieve from test collection with one post", async function () {
 		try {
 			let page = await connectToInstagram();
-			await getSavedPosts(page, "Test");
+
+			const extractedPosts = await getSavedPosts(page, "Test - One Post");
+			expect(extractedPosts.length).to.equal(1);
+			const firstPost = extractedPosts[0];
+
+			expect(firstPost.url).to.equal("https://www.instagram.com/p/C1trR4gLHBb/");
+			expect(firstPost.username).to.equal("gigi_goes_vegan");
+			expect(firstPost.imageURL.startsWith("https://instagram.fyto1-2.fna.fbcdn.net"));
+			expect(
+				firstPost.description.startsWith(
+					"TOFU FLATBREAD \n\nHigh Protein Veganuary episode 5:"
+				)
+			);
+
 			await disconnectFromInstagram();
 		} catch (e) {
 			expect.fail(e);
 		}
 	});
+
+	it("Should return from test collection with many posts", async function () {});
 });
