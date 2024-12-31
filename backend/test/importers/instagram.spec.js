@@ -1,11 +1,3 @@
-// tests for downloading saved posts from instagram
-
-// test that instagram can be connected to
-// test that account can be signed in to
-// test that we can get to saved posts
-// test that correct post information gets downloaded
-// test usage of AI tools for getting recipe title, ingredients, and instructions
-
 import { expect } from "chai";
 import "dotenv/config";
 import {
@@ -50,5 +42,29 @@ describe("Instagram", function () {
 		}
 	});
 
-	it("Should return from test collection with many posts", async function () {});
+	it("Should retrieve from test collection with multiple posts", async function () {
+		try {
+			let page = await connectToInstagram();
+
+			const extractedPosts = await getSavedPosts(page, "Test - Multiple Posts");
+			expect(extractedPosts.length).to.equal(4);
+
+			const firstPost = extractedPosts[0];
+			expect(firstPost.url).to.equal("https://www.instagram.com/p/C99_BZHJwjG/");
+			expect(firstPost.username).to.equal("rainbowplantlife");
+
+			const lastPost = extractedPosts[3];
+			expect(lastPost.url).to.equal("https://www.instagram.com/p/C732X4sPtmt/");
+			expect(lastPost.imageURL.startsWith("https://instagram.fyto1-2.fna.fbcdn.net"));
+			expect(
+				lastPost.description.startsWith(
+					"These almond croissant cookie bars taste like the classic pastry"
+				)
+			);
+
+			await disconnectFromInstagram();
+		} catch (e) {
+			expect.fail(e);
+		}
+	});
 });
